@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mom's Birthday Portal 🌺</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              fredoka: ['Fredoka', 'sans-serif'],
+              sans: ['Plus Jakarta Sans', 'sans-serif'],
+            },
+            colors: {
+              tropical: {
+                pink: '#ff6b8b',
+                purple: '#8a4fff',
+                teal: '#14b8a6',
+                yellow: '#facc15',
+                softBg: '#fff0f5'
+              }
+            },
+            animation: {
+              'bounce-slow': 'bounce 2s infinite',
+              'wiggle': 'wiggle 0.5s ease-in-out infinite',
+              'float': 'float 3s ease-in-out infinite',
+            },
+            keyframes: {
+              wiggle: {
+                '0%, 100%': { transform: 'rotate(-3deg)' },
+                '50%': { transform: 'rotate(3deg)' },
+              },
+              float: {
+                '0%, 100%': { transform: 'translateY(0px)' },
+                '50%': { transform: 'translateY(-10px)' },
+              }
+            }
+          }
+        }
+      }
+    </script>
+
+    <style>
+        body {
+            background: linear-gradient(135deg, #fff0f5 0%, #ffd1dc 40%, #e0f2fe 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        /* Glassmorphism styling */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 10px 30px -5px rgba(236, 72, 153, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+
+        .glow-btn {
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+        }
+        
+        .glow-btn:hover {
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.8);
+        }
+
+        /* 3D Gift Box Animation */
+        .gift-box-container {
+            perspective: 1000px;
+        }
+
+        .gift-box {
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+        }
+
+        .gift-lid {
+            transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.5s ease;
+            transform-origin: top;
+        }
+
+        .gift-box.open .gift-lid {
+            transform: rotateX(-110deg) translateY(-40px);
+            opacity: 0;
+        }
+
+        .step-panel {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="font-sans text-gray-800 pb-16">
+
+    <!-- Ambient Floating Particles Canvas -->
+    <canvas id="bgCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    <!-- Top Navigation Header -->
+    <header class="relative z-10 max-w-4xl mx-auto px-4 pt-6 flex justify-between items-center">
+        <div class="inline-flex items-center gap-2 bg-white/80 backdrop-blur-md px-4 py-2 rounded-full border border-pink-200 shadow-sm">
+            <span class="text-xl">🌺</span>
+            <span class="font-fredoka font-semibold text-pink-600 text-sm sm:text-base">Mom's Hawaii Birthday Portal</span>
+        </div>
+
+        <button id="soundToggle" onclick="toggleAudio()" class="bg-white/80 backdrop-blur-md hover:bg-white text-gray-700 px-4 py-2 rounded-full border border-pink-200 shadow-sm flex items-center gap-2 text-xs sm:text-sm font-semibold transition hover:scale-105 active:scale-95">
+            <i id="soundIcon" data-lucide="volume-2" class="w-4 h-4 text-pink-500"></i>
+            <span id="soundText">Sound: ON</span>
+        </button>
+    </header>
+
+    <main class="relative z-10 max-w-2xl mx-auto px-4 mt-8">
+
+        <!-- ==========================================
+             STEP 1: WELCOME SCREEN
+             ========================================== -->
+        <section id="step1" class="step-panel glass-card rounded-3xl p-6 sm:p-10 text-center space-y-8">
+            <div class="inline-block animate-float">
+                <span class="bg-teal-100 text-teal-800 font-fredoka px-4 py-1.5 rounded-full text-sm font-bold shadow-inner border border-teal-200">
+                    Aloha Mom! 🌴
+                </span>
+            </div>
+
+            <div class="space-y-4">
+                <div class="text-5xl sm:text-6xl my-2">✈️🌺🏝️</div>
+                <h1 class="font-fredoka text-2xl sm:text-3xl font-bold text-gray-800 leading-relaxed sm:leading-snug">
+                    Hi mom! Kenny already got you a trip to Hawaii but we both know I'm your favorite so you'll like mine just as much anyway.
+                </h1>
+            </div>
+
+            <div class="pt-4">
+                <button onclick="goToStep(2)" class="w-full sm:w-auto bg-gradient-to-r from-pink-500 via-purple-500 to-pink-600 hover:from-pink-600 hover:to-purple-600 text-white font-fredoka text-xl px-10 py-4 rounded-2xl shadow-lg transition transform hover:scale-105 active:scale-95 flex items-center justify-center gap-3 mx-auto cursor-pointer">
+                    <span>Continue</span>
+                    <i data-lucide="arrow-right" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             STEP 2: RUNAWAY "NO" BUTTON CHALLENGE
+             ========================================== -->
+        <section id="step2" class="step-panel glass-card rounded-3xl p-6 sm:p-10 text-center space-y-6 hidden">
+            <div class="space-y-2">
+                <span class="bg-pink-100 text-pink-700 font-fredoka px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                    Security Verification 🔒
+                </span>
+                <h2 class="font-fredoka text-2xl sm:text-3xl font-bold text-gray-800">
+                    Am I your favorite child?
+                </h2>
+                <p class="text-gray-500 text-xs sm:text-sm">
+                    (Please select the correct answer below to proceed)
+                </p>
+            </div>
+
+            <!-- Evasive Arena -->
+            <div id="surveyContainer" class="relative min-h-[200px] w-full bg-pink-50/50 rounded-2xl border-2 border-dashed border-pink-200 p-6 flex flex-col sm:flex-row items-center justify-center gap-6 overflow-hidden">
+                
+                <!-- YES BUTTON -->
+                <button id="yesBtn" onclick="handleYesClick()" class="glow-btn bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-fredoka text-xl px-8 py-4 rounded-2xl transition transform hover:scale-110 active:scale-95 flex items-center gap-3 cursor-pointer z-20 shadow-lg">
+                    <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    <span>YES! 💖</span>
+                </button>
+
+                <!-- EVASIVE NO BUTTON -->
+                <button id="noBtn" class="bg-gray-400 hover:bg-gray-500 text-white font-fredoka text-lg px-6 py-3 rounded-2xl transition-all duration-150 ease-out z-10 shadow-md" style="position: relative;">
+                    <span>NO 👎</span>
+                </button>
+            </div>
+
+            <p class="text-xs text-gray-400 italic">
+                * Error: "NO" option permanently disabled by system admin.
+            </p>
+        </section>
+
+        <!-- ==========================================
+             STEP 3: FUNNY COUPONS & CHILD RATING
+             ========================================== -->
+        <section id="step3" class="step-panel glass-card rounded-3xl p-6 sm:p-8 space-y-8 hidden">
+            <div class="text-center space-y-2 border-b border-pink-100 pb-4">
+                <span class="bg-purple-100 text-purple-700 font-fredoka px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
+                    VIP Mom Privileges 🎟️
+                </span>
+                <h2 class="font-fredoka text-2xl sm:text-3xl font-bold text-gray-800">Your Exclusive Birthday Coupons</h2>
+                <p class="text-xs text-gray-500">Tap each coupon to redeem your child service vouchers!</p>
+            </div>
+
+            <!-- Custom Coupons Grid -->
+            <div class="space-y-4">
+                
+                <!-- Coupon 1 -->
+                <div id="coupon1" onclick="claimCoupon('coupon1')" class="cursor-pointer group relative bg-white hover:bg-pink-50/80 border-2 border-pink-200 hover:border-pink-400 rounded-2xl p-5 text-left transition transform hover:-translate-y-1 shadow-sm flex items-start justify-between gap-4">
+                    <div class="space-y-1">
+                        <span id="badge1" class="inline-block bg-pink-100 text-pink-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase mb-1">Unclaimed Voucher</span>
+                        <h3 class="font-bold text-gray-800 text-base sm:text-lg leading-snug">
+                            "3 free glasses of ice water after I've already crawled in bed."
+                        </h3>
+                        <p class="text-xs text-gray-500">Valid anytime, no matter how comfy I am!</p>
+                    </div>
+                    <div class="text-3xl sm:text-4xl">🧊💧</div>
+                </div>
+
+                <!-- Coupon 2 -->
+                <div id="coupon2" onclick="claimCoupon('coupon2')" class="cursor-pointer group relative bg-white hover:bg-pink-50/80 border-2 border-pink-200 hover:border-pink-400 rounded-2xl p-5 text-left transition transform hover:-translate-y-1 shadow-sm flex items-start justify-between gap-4">
+                    <div class="space-y-1">
+                        <span id="badge2" class="inline-block bg-pink-100 text-pink-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase mb-1">Unclaimed Voucher</span>
+                        <h3 class="font-bold text-gray-800 text-base sm:text-lg leading-snug">
+                            "1 free backup against Kenny (as long as I don't get in trouble.)"
+                        </h3>
+                        <p class="text-xs text-gray-500">Guaranteed verbal support in any argument.</p>
+                    </div>
+                    <div class="text-3xl sm:text-4xl">🛡️🤝</div>
+                </div>
+
+                <!-- Coupon 3 -->
+                <div id="coupon3" onclick="claimCoupon('coupon3')" class="cursor-pointer group relative bg-white hover:bg-pink-50/80 border-2 border-pink-200 hover:border-pink-400 rounded-2xl p-5 text-left transition transform hover:-translate-y-1 shadow-sm flex items-start justify-between gap-4">
+                    <div class="space-y-1">
+                        <span id="badge3" class="inline-block bg-pink-100 text-pink-600 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase mb-1">Unclaimed Voucher</span>
+                        <h3 class="font-bold text-gray-800 text-base sm:text-lg leading-snug">
+                            "1 free occasion of watching Bentley (coupon null if he bites me)"
+                        </h3>
+                        <p class="text-xs text-gray-500">I will totally leave him outside.</p>
+                    </div>
+                    <div class="text-3xl sm:text-4xl">🐶🦴</div>
+                </div>
+
+            </div>
+
+            <!-- Child Performance Rating Widget -->
+            <div class="bg-gradient-to-r from-amber-50 to-yellow-50 rounded-2xl p-5 border border-amber-200 text-center space-y-2 shadow-inner">
+                <label class="block text-xs font-bold uppercase tracking-wider text-amber-800">
+                    Child Performance Rating (Verified)
+                </label>
+                
+                <div class="flex justify-center items-center gap-2 text-amber-400 text-3xl py-1">
+                    <i class="fa-solid fa-star transition transform hover:scale-125 cursor-pointer" onclick="triggerRatingNotice()"></i>
+                    <i class="fa-solid fa-star transition transform hover:scale-125 cursor-pointer" onclick="triggerRatingNotice()"></i>
+                    <i class="fa-solid fa-star transition transform hover:scale-125 cursor-pointer" onclick="triggerRatingNotice()"></i>
+                    <i class="fa-solid fa-star transition transform hover:scale-125 cursor-pointer" onclick="triggerRatingNotice()"></i>
+                    <i class="fa-solid fa-star transition transform hover:scale-125 cursor-pointer" onclick="triggerRatingNotice()"></i>
+                </div>
+
+                <p class="text-xs text-amber-900/80 font-semibold flex items-center justify-center gap-1.5">
+                    <i data-lucide="lock" class="w-3.5 h-3.5"></i>
+                    <span>Locked at 5/5 stars (No edits permitted).</span>
+                </p>
+            </div>
+
+            <!-- Continue Button to Step 4 -->
+            <div class="pt-2">
+                <button onclick="goToStep(4)" class="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-fredoka text-xl py-4 rounded-2xl shadow-lg transition transform hover:scale-105 active:scale-95 flex items-center justify-center gap-2 cursor-pointer">
+                    <span>Continue to Mystery Present</span>
+                    <i data-lucide="arrow-right" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             STEP 4: MYSTERY PRESENT REVEAL
+             ========================================== -->
+        <section id="step4" class="step-panel glass-card rounded-3xl p-6 sm:p-10 text-center space-y-6 hidden relative overflow-hidden">
+            
+            <!-- (NO HAPPY BIRTHDAY TEXT HERE) -->
+            <p class="text-pink-600 font-fredoka text-base font-semibold animate-pulse">
+                Tap the present box below! ✨
+            </p>
+
+            <!-- 3D Gift Box -->
+            <div class="py-6 flex justify-center items-center">
+                <div id="giftContainer" onclick="unwrapGift()" class="gift-box-container cursor-pointer group">
+                    <div id="giftBox" class="gift-box w-52 h-52 sm:w-60 sm:h-60 relative flex items-center justify-center">
+                        
+                        <!-- Gift Box Lid -->
+                        <div class="gift-lid absolute -top-4 w-56 sm:w-64 h-14 bg-gradient-to-r from-teal-400 via-pink-500 to-purple-500 rounded-lg shadow-lg z-30 flex items-center justify-center">
+                            <!-- Bow -->
+                            <div class="absolute -top-7 w-20 h-12 bg-yellow-400 rounded-full shadow-md flex items-center justify-center border-2 border-yellow-300 animate-wiggle">
+                                <div class="w-5 h-5 bg-yellow-500 rounded-full"></div>
+                            </div>
+                            <!-- Lid Ribbon -->
+                            <div class="w-10 h-full bg-yellow-400/90 shadow-sm"></div>
+                        </div>
+
+                        <!-- Gift Box Body -->
+                        <div class="w-full h-full bg-gradient-to-br from-pink-400 via-rose-400 to-purple-500 rounded-2xl shadow-2xl z-20 flex items-center justify-center relative overflow-hidden border-2 border-pink-300">
+                            <div class="w-12 h-full bg-yellow-400 opacity-90 shadow-inner"></div>
+                            <div class="h-12 w-full bg-yellow-400 opacity-90 absolute shadow-inner"></div>
+                            <div class="absolute inset-0 bg-gradient-to-tr from-transparent via-white/20 to-transparent group-hover:translate-x-full transition-transform duration-1000"></div>
+                        </div>
+
+                        <div class="absolute -top-3 -left-3 text-3xl animate-bounce">🌺</div>
+                        <div class="absolute -bottom-3 -right-3 text-3xl animate-bounce" style="animation-delay: 0.5s;">🏖️</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==========================================
+         PRESENT OVERLAY MODAL (TRIGGERED ON GIFT CLICK)
+         ========================================== -->
+    <div id="giftModal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden modal-backdrop">
+        <div id="giftModalContent" class="bg-gradient-to-b from-white via-pink-50 to-teal-50 rounded-3xl p-6 sm:p-8 max-w-lg w-full text-center space-y-6 shadow-2xl border-4 border-pink-300 transform transition-all scale-90 opacity-0 relative overflow-hidden max-h-[90vh] overflow-y-auto">
+            
+            <div class="text-4xl animate-bounce">🎁💖🌴</div>
+
+            <!-- EXACT MANDATED HEADER TEXT -->
+            <div class="space-y-2 border-b border-pink-200 pb-4">
+                <h3 class="font-fredoka text-3xl sm:text-4xl font-bold text-pink-600 leading-tight">
+                    I love you!
+                </h3>
+                <h4 class="font-fredoka text-xl sm:text-2xl font-bold text-gray-800">
+                    Now time to open your real present!
+                </h4>
+            </div>
+
+            <!-- HAWAII BUNDLE ITEMS LIST -->
+            <div class="space-y-3 text-left">
+                <p class="text-xs font-bold uppercase tracking-wider text-teal-800 text-center">
+                    🌴 Your Hawaii Beach Gear Package Includes: 🏖️
+                </p>
+
+                <div class="bg-white/90 p-3.5 rounded-2xl border border-pink-100 shadow-sm flex items-center gap-3">
+                    <div class="text-2xl">👜</div>
+                    <div>
+                        <h5 class="font-bold text-gray-800 text-sm">Waterproof Beach Tote</h5>
+                        <p class="text-xs text-gray-500">Becauce you obviously don't have enough</p>
+                    </div>
+                </div>
+
+                <div class="bg-white/90 p-3.5 rounded-2xl border border-pink-100 shadow-sm flex items-center gap-3">
+                    <div class="text-2xl">🏖️</div>
+                    <div>
+                        <h5 class="font-bold text-gray-800 text-sm">Two Large Beach Towels</h5>
+                        <p class="text-xs text-gray-500">Now you and Kenny can match!</p>
+                    </div>
+                </div>
+
+                <div class="bg-white/90 p-3.5 rounded-2xl border border-pink-100 shadow-sm flex items-center gap-3">
+                    <div class="text-2xl">🧴</div>
+                    <div>
+                        <h5 class="font-bold text-gray-800 text-sm">Sunscreen & Aloe Vera</h5>
+                        <p class="text-xs text-gray-500">Sun protection & soothing post-mistake care</p>
+                    </div>
+                </div>
+
+                <div class="bg-white/90 p-3.5 rounded-2xl border border-pink-100 shadow-sm flex items-center gap-3">
+                    <div class="text-2xl">🥤</div>
+                    <div>
+                        <h5 class="font-bold text-gray-800 text-sm">Custom Tumbler</h5>
+                        <p class="text-xs text-gray-500">To add to the collection</p>
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="triggerConfettiBurst()" class="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-teal-500 text-white font-fredoka text-lg py-3.5 rounded-2xl shadow-lg hover:opacity-95 transition transform active:scale-95 flex items-center justify-center gap-2">
+                <i data-lucide="party-popper" class="w-5 h-5"></i>
+                <span>Celebrate & Launch Confetti! 🎉</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Audio Effects using Web Audio API
+        let soundEnabled = true;
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (!soundEnabled) return;
+            try {
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                const now = audioCtx.currentTime;
+
+                if (type === 'pop') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.exponentialRampToValueAtTime(800, now + 0.1);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.1);
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                } else if (type === 'fanfare') {
+                    const notes = [523.25, 659.25, 783.99, 1046.50];
+                    notes.forEach((freq, i) => {
+                        const noteOsc = audioCtx.createOscillator();
+                        const noteGain = audioCtx.createGain();
+                        noteOsc.connect(noteGain);
+                        noteGain.connect(audioCtx.destination);
+                        
+                        noteOsc.frequency.setValueAtTime(freq, now + (i * 0.1));
+                        noteGain.gain.setValueAtTime(0.2, now + (i * 0.1));
+                        noteGain.gain.linearRampToValueAtTime(0.01, now + (i * 0.1) + 0.25);
+                        
+                        noteOsc.start(now + (i * 0.1));
+                        noteOsc.stop(now + (i * 0.1) + 0.3);
+                    });
+                } else if (type === 'dodge') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.linearRampToValueAtTime(150, now + 0.08);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.08);
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                }
+            } catch(e) {
+                console.log("Audio muted:", e);
+            }
+        }
+
+        function toggleAudio() {
+            soundEnabled = !soundEnabled;
+            const soundIcon = document.getElementById('soundIcon');
+            const soundText = document.getElementById('soundText');
+            
+            if (soundEnabled) {
+                soundText.innerText = "Sound: ON";
+                soundIcon.setAttribute('data-lucide', 'volume-2');
+            } else {
+                soundText.innerText = "Sound: OFF";
+                soundIcon.setAttribute('data-lucide', 'volume-x');
+            }
+            lucide.createIcons();
+        }
+
+        /* STEP NAVIGATION CONTROLLER */
+        function goToStep(stepNumber) {
+            playSound('pop');
+            
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`step${i}`);
+                if (step) {
+                    step.classList.add('hidden');
+                }
+            }
+
+            const targetStep = document.getElementById(`step${stepNumber}`);
+            if (targetStep) {
+                targetStep.classList.remove('hidden');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        /* STEP 2: RUNAWAY "NO" BUTTON */
+        const noBtn = document.getElementById('noBtn');
+        const surveyContainer = document.getElementById('surveyContainer');
+
+        function moveNoButton() {
+            playSound('dodge');
+            
+            const containerRect = surveyContainer.getBoundingClientRect();
+            const btnRect = noBtn.getBoundingClientRect();
+
+            const maxX = containerRect.width - btnRect.width - 20;
+            const maxY = containerRect.height - btnRect.height - 20;
+
+            const randomX = Math.max(10, Math.floor(Math.random() * maxX));
+            const randomY = Math.max(10, Math.floor(Math.random() * maxY));
+
+            noBtn.style.position = 'absolute';
+            noBtn.style.left = `${randomX}px`;
+            noBtn.style.top = `${randomY}px`;
+        }
+
+        noBtn.addEventListener('mouseenter', moveNoButton);
+        noBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            moveNoButton();
+        });
+
+        function handleYesClick() {
+            playSound('fanfare');
+            triggerConfettiBurst();
+            goToStep(3);
+        }
+
+        /* STEP 3: COUPONS & RATING */
+        function claimCoupon(id) {
+            const card = document.getElementById(id);
+            const badge = card.querySelector('span');
+            
+            playSound('pop');
+            
+            card.classList.remove('hover:-translate-y-1', 'hover:border-pink-400');
+            card.classList.add('bg-teal-50', 'border-teal-300', 'opacity-90');
+            badge.className = 'inline-block bg-teal-200 text-teal-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase mb-1';
+            badge.innerText = 'Redeemed! ✓';
+
+            confetti({
+                particleCount: 20,
+                spread: 40,
+                origin: { y: 0.6 }
+            });
+        }
+
+        function triggerRatingNotice() {
+            playSound('pop');
+            confetti({ particleCount: 15, spread: 30 });
+        }
+
+        /* STEP 4: PRESENT REVEAL */
+        let isGiftOpened = false;
+
+        function unwrapGift() {
+            if (isGiftOpened) return;
+            isGiftOpened = true;
+
+            playSound('fanfare');
+            
+            const giftBox = document.getElementById('giftBox');
+            giftBox.classList.add('open');
+
+            // Celebration Confetti
+            const duration = 2.5 * 1000;
+            const end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 5,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0 }
+                });
+                confetti({
+                    particleCount: 5,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1 }
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+
+            // Open Modal Overlay after unwrap animation completes
+            setTimeout(() => {
+                const modal = document.getElementById('giftModal');
+                const content = document.getElementById('giftModalContent');
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    content.classList.remove('scale-90', 'opacity-0');
+                    content.classList.add('scale-100', 'opacity-100');
+                }, 50);
+            }, 600);
+        }
+
+        function triggerConfettiBurst() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+        }
+
+        /* BACKGROUND CANVASES */
+        const canvas = document.getElementById('bgCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 5 + 2;
+                this.speedY = Math.random() * 0.6 + 0.2;
+                this.color = ['rgba(255,182,193,0.6)', 'rgba(20,184,166,0.4)', 'rgba(250,204,21,0.5)'][Math.floor(Math.random() * 3)];
+            }
+            update() {
+                this.y -= this.speedY;
+                if (this.y < -10) {
+                    this.y = canvas.height + 10;
+                    this.x = Math.random() * canvas.width;
+                }
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 25; i++) {
+            particles.push(new Particle());
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.onload = function() {
+            animateParticles();
+        };
+    </script>
+</body>
+</html>
